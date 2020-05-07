@@ -18,11 +18,11 @@ class ShippingController
       shipment = Shipment.new()
       @shipment_id = shipment.create(prepare_shipments_data)
 
-      # Inserting packages data into shipments table
+      # Inserting packages data into packages table
       package = Package.new()
       @package_id = package.create(prepare_packages_data)
       
-      # Inserting packages data into activities table
+      # Inserting activities data into activities table
       activity_model = Activity.new()
       activities = @xml_to_parse.css('Activity')
       activities.css('Activity').each do | activity |
@@ -80,7 +80,6 @@ class ShippingController
     }
   end
 
-  
   def prepare_activities_data(activity)
     {
       'package_id' => @package_id,
@@ -97,4 +96,5 @@ class ShippingController
       'activity_time' => activity.css('Time').text
     }
   end
+
 end
