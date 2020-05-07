@@ -4,14 +4,10 @@ require './model/shipment'
 require './model/package'
 require './model/activity'
 
-class ShippingController
+class ParseXmlService
   
-  def initialize(shipping_xml)
-    @xml_to_parse = Nokogiri.XML(shipping_xml)
-    import_xml_to_db()
-  end
-
-  def import_xml_to_db()
+  def import_xml_to_db(xml_to_parse)
+    @xml_to_parse = xml_to_parse
     puts "XML parsing is in process....\n\n\n"
     begin
       create_shipment 
@@ -21,11 +17,9 @@ class ShippingController
       puts "Could not complete the import"
     end
 
-    puts "Data successfully imported to the database!!!!\n\n\n"
+    puts "Data Import Done!!!!\n\n\n"
   end
 
-  private
-  
   # Inserting shipments data into shipments table
   def create_shipment
     begin
