@@ -13,31 +13,53 @@ class ShippingController
 
   def import_xml_to_db()
     puts "XML parsing is in process....\n\n\n"
-    begin 
-      # Inserting shipments data into shipments table
-      shipment = Shipment.new()
-      @shipment_id = shipment.create(prepare_shipments_data)
-
-      # Inserting packages data into packages table
-      package = Package.new()
-      @package_id = package.create(prepare_packages_data)
-      
-      # Inserting activities data into activities table
-      activity_model = Activity.new()
-      activities = @xml_to_parse.css('Activity')
-      activities.css('Activity').each do | activity |
-        activity_model.create(prepare_activities_data(activity))
-      end
+    begin
+      create_shipment 
+      create_package 
+      create_activity
     rescue
-      puts "Oops! Somthing went wrong while importing the data"
-      return false
+      puts "Could not complete the import"
     end
 
     puts "Data successfully imported to the database!!!!\n\n\n"
   end
 
   private
+  
+  # Inserting shipments data into shipments table
+  def create_shipment
+    begin
+      shipment = Shipment.new()
+      @shipment_id = shipment.create(prepare_shipments_data)
+    rescue
+      puts "Oops! Something went wrong while importing Shipments"
+    end
+  end
 
+  # Inserting packages data into packages table
+  def create_package
+    begin
+      package = Package.new()
+      @package_id = package.create(prepare_packages_data)
+    rescue
+      puts "Oops! Something went wrong while importing Packages"
+    end
+  end
+
+  # Inserting activities data into activities table
+  def create_activity 
+    begin
+      activity_model = Activity.new()
+      activities = @xml_to_parse.css('Activity')
+      activities.css('Activity').each do | activity |
+        activity_model.create(prepare_activities_data(activity))
+      end
+    rescue
+      puts "Oops! Something went wrong while importing Activities"
+    end
+  end
+  
+  # Prepare shipments data
   def prepare_shipments_data
     {
       'shipper_number'=>@xml_to_parse.css('Shipper ShipperNumber').text, 
@@ -71,6 +93,7 @@ class ShippingController
     }
   end
 
+  # Prepare packages data
   def prepare_packages_data
     {
       'shipment_id' => @shipment_id,
@@ -80,6 +103,7 @@ class ShippingController
     }
   end
 
+  # Prepare activities data
   def prepare_activities_data(activity)
     {
       'package_id' => @package_id,
